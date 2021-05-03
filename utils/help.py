@@ -23,18 +23,18 @@ class MyHelp(commands.HelpCommand):
         )
 
     async def send_bot_help(self, mapping):
-        cogs_embed = discord.Embed(title="All Categories")
+        cogs_embed = discord.Embed(title="All Categories", color=self.context.bot.default_color)
         cogs_embed.set_footer(text=self.get_opening_note())
         commands_embeds = []
-        for cog,cmds in mapping.items():
-            cogs_embed.add_field(name=getattr(cog, "qualified_name", "No category"), value="\n".join(x.name for x in cmds), inline=False)
-            command_embed = discord.Embed(title=getattr(cog, "qualified_name", "No category"))
+        for cog, cmds in mapping.items():
+            cogs_embed.add_field(name=getattr(cog, "qualified_name", "No category"),
+                                 value="\n".join(x.name for x in cmds), inline=False)
+            command_embed = discord.Embed(title=getattr(cog, "qualified_name", "No category"),
+                                          color=self.context.bot.default_color)
             for cmd in cmds:
                 description = cmd.brief or "No description"
-                command_embed.add_field(name=cmd.name,value = f"{description}\n`{self.get_command_signature(cmd)}`")
+                command_embed.add_field(name=cmd.name, value=f"{description}\n`{self.get_command_signature(cmd)}`")
             commands_embeds.append(command_embed)
         commands_embeds.insert(0, cogs_embed)
         page = menus.MenuPages(source=PageSource(commands_embeds))
         await page.start(self.context)
-
-

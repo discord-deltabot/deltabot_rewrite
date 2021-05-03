@@ -13,6 +13,7 @@ load_dotenv()
 class MyBot(commands.Bot):
     def __init__(self):
         self.default_prefix = os.environ.get("BOT_PREFIX")
+        self.default_color = discord.Color.dark_purple()
         database_credentials = {
             "host": os.environ.get("DATABASE_HOST"),
             "user": os.environ.get("DATABASE_USER"),
@@ -49,7 +50,8 @@ async def on_ready():
     print("bot is online")
     cogs = [
         "cogs.prefix",
-        "cogs.moderation"
+        "cogs.moderation",
+        "cogs.utils"
     ]
     for cog in cogs:
         bot.load_extension(cog)
