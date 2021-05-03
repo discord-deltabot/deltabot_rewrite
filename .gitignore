@@ -1,3 +1,5 @@
 .env
 .idea/
 *.pyc
+cogs/__pycache__/prefix.cpython-39.pyc
+utils/__pycache__/help.cpython-39.pyc

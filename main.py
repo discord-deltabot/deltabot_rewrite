@@ -48,7 +48,8 @@ bot = MyBot()
 async def on_ready():
     print("bot is online")
     cogs = [
-        "cogs.prefix"
+        "cogs.prefix",
+        "cogs.moderation"
     ]
     for cog in cogs:
         bot.load_extension(cog)
