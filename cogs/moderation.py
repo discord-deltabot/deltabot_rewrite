@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+
 class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -30,14 +31,14 @@ class Moderation(commands.Cog):
         except discord.Forbidden:
             return await ctx.send("Are you trying to kick someone higher than the bot?")
 
-
     @commands.has_permissions(manage_guild=True)
-    @commands.command(brief = "delete bulk messages")
+    @commands.command(brief="delete bulk messages")
     async def purge(self, ctx, limit: int):
         """Bulk deletes messages"""
 
         await ctx.purge(limit=limit + 1)  # also deletes your own message
         await ctx.send(f"Bulk deleted `{limit}` messages")
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

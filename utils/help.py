@@ -51,6 +51,13 @@ class MyHelp(commands.HelpCommand):
         embed = discord.Embed(title=cog.qualified_name, color = self.context.bot.default_color)
         cmds = cog.__cog_commands__
         for cmd in cmds:
-            description = cmd.brief or "No Description"
-            embed.add_field(name=cmd.name, value=f"`{description}`")
+            description = f"{cmd.brief or 'No Description'}\n`{self.get_command_signature(cmd)}`"
+            embed.add_field(name=cmd.name, value=description)
+        await self.context.send(embed=embed)
+
+    async def send_group_help(self, group):
+        embed = discord.Embed(title=group.name, description=group.brief)
+        for cmd in group.commands:
+            description = f"{cmd.brief or 'No Description'}\n`{self.get_command_signature(cmd)}`"
+            embed.add_field(name=cmd.name, value=description)
         await self.context.send(embed=embed)
