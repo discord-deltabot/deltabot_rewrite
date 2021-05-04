@@ -24,11 +24,11 @@ class MyHelp(commands.HelpCommand):
 
     async def send_bot_help(self, mapping):
         cogs_embed = discord.Embed(title="All Categories", color=self.context.bot.default_color)
-        cogs_embed.set_footer(text=self.get_opening_note())
+        cogs_embed.description = self.get_opening_note()
         commands_embeds = []
         for cog, cmds in mapping.items():
             cogs_embed.add_field(name=getattr(cog, "qualified_name", "No category"),
-                                 value="\n".join(x.name for x in cmds), inline=False)
+                                 value="\n".join(f"`{self.get_command_signature(x)}`" for x in cmds))
             command_embed = discord.Embed(title=getattr(cog, "qualified_name", "No category"),
                                           color=self.context.bot.default_color)
             for cmd in cmds:
@@ -38,3 +38,19 @@ class MyHelp(commands.HelpCommand):
         commands_embeds.insert(0, cogs_embed)
         page = menus.MenuPages(source=PageSource(commands_embeds))
         await page.start(self.context)
+
+    async def send_command_help(self, command):
+        description = f"{command.brief or 'No description'}"
+        embed = discord.Embed(title=f"`{self.get_command_signature(command)}`", description=description,
+                              color=self.context.bot.default_color)
+        if command.aliases:
+            embed.add_field(name="Aliases", value="".join(f"\n{x}" for x in command.aliases))
+        await self.context.send(embed=embed)
+
+    async def send_cog_help(self, cog):
+        embed = discord.Embed(title=cog.qualified_name, color = self.context.bot.default_color)
+        cmds = cog.__cog_commands__
+        for cmd in cmds:
+            description = cmd.brief or "No Description"
+            embed.add_field(name=cmd.name, value=f"`{description}`")
+        await self.context.send(embed=embed)

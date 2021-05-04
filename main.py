@@ -51,7 +51,8 @@ async def on_ready():
     cogs = [
         "cogs.prefix",
         "cogs.moderation",
-        "cogs.utils"
+        "cogs.economy",
+        "jishaku"
     ]
     for cog in cogs:
         bot.load_extension(cog)

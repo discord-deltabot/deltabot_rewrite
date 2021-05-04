@@ -5,7 +5,7 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(brief="Ban a member in the server")
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, user: discord.User = None, reason=None):
         """Ban a user from the server"""
@@ -20,7 +20,7 @@ class Moderation(commands.Cog):
             return await ctx.send("Are you trying to ban someone higher than the bot")
 
     @commands.has_permissions(kick_members=True)
-    @commands.command()
+    @commands.command(brief="Kick a member")
     async def kick(self, ctx, user: discord.User = None, reason=None):
         if not user:
             return await ctx.send("You must specify a user")
@@ -32,7 +32,7 @@ class Moderation(commands.Cog):
 
 
     @commands.has_permissions(manage_guild=True)
-    @commands.command()
+    @commands.command(brief = "delete bulk messages")
     async def purge(self, ctx, limit: int):
         """Bulk deletes messages"""
 
