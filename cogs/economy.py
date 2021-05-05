@@ -62,6 +62,16 @@ class Economy(commands.Cog):
         await self.bot.db.execute(sql, money, ctx.author.id)
         await ctx.send("You have deposited {} coins to your bank".format(str(money)))
 
+    @commands.command(brief="Check store to buy useful items")
+    async def store(self, ctx):
+        embed = discord.Embed(title="`Store`", color=self.bot.default_color)
+        items = await self.bot.db.fetch("SELECT * FROM store;")
+        for item in items:
+            embed.add_field(name=f"{item['emoji']} {item['name']}", value=f"💰 {item['price']}")
+        await ctx.send(embed=embed)
+
+
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))

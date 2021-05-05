@@ -4,6 +4,7 @@ from discord.ext import commands
 import os
 import asyncpg
 import asyncio
+import aiohttp
 
 from utils.help import MyHelp
 
@@ -23,6 +24,7 @@ class MyBot(commands.Bot):
         self.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**database_credentials))
 
         self.prefixes = {}
+        self.session = aiohttp.ClientSession()
         super(MyBot, self).__init__(command_prefix=self.get_prefix, help_command=MyHelp())
 
     def starter(self):
