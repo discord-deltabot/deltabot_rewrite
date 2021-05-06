@@ -14,12 +14,12 @@ class Image(commands.Cog):
         if image is None:
             image_url = ctx.author.avatar_url()
             async with self.bot.session.get(str(image_url)) as r:
-                img_bytes = await r.content()
+                img_bytes = await r.read()
         try:
             member = await commands.MemberConverter().convert(ctx=ctx, argument=image)
             image_url = member.avatar_url()
             async with self.bot.session.get(str(image_url)) as r:
-                img_bytes = await r.content()
+                img_bytes = await r.read()
         except:
             return await ctx.send("Emoji inverting coming soon")
 
