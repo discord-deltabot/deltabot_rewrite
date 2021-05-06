@@ -15,6 +15,12 @@ class Prefix(commands.Cog):
         self.bot.prefixes[ctx.guild.id] = prefix
         await ctx.send("The prefix for the server has been updated")
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.content == self.bot.user.display_name:
+            prefix = self.bot.get_prefix(message)
+            await message.channel.send("my prefix for this server is `{}`".format(prefix))
+
 
 def setup(bot):
     bot.add_cog(Prefix(bot))
