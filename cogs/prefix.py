@@ -17,7 +17,7 @@ class Prefix(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content == self.bot.user.mention:
+        if message.content in [f"<@{str(self.bot.user.id)}>", f"<@!{str(self.bot.user.id)}>"]:
             prefix = await self.bot.get_prefix(message)
             await message.channel.send("my prefix for this server is `{}`".format(prefix))
 
