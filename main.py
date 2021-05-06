@@ -24,7 +24,6 @@ class MyBot(commands.Bot):
         self.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**database_credentials))
 
         self.prefixes = {}
-        self.session = aiohttp.ClientSession()
         super(MyBot, self).__init__(command_prefix=self.get_prefix, help_command=MyHelp())
 
     def starter(self):
@@ -56,6 +55,7 @@ async def on_ready():
         "cogs.economy",
         "jishaku"
     ]
+    bot.session = aiohttp.ClientSession()
     for cog in cogs:
         bot.load_extension(cog)
 

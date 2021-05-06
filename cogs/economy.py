@@ -38,7 +38,7 @@ class Economy(commands.Cog):
     @beg.error
     async def on_beg_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            return await ctx.send(f"Dude I am not Elon wait {error.retry_after.round()}s before asking again!")
+            return await ctx.send(f"Dude I am not Elon wait {int(error.retry_after)}s before asking again!")
 
     @commands.command(brief="Deposit money to bank", aliases=["dep"])
     async def deposit(self, ctx, money: int):
@@ -70,7 +70,21 @@ class Economy(commands.Cog):
             embed.add_field(name=f"{item['emoji']} {item['name']}", value=f"💰 {item['price']}")
         await ctx.send(embed=embed)
 
-
+    @commands.command()
+    async def buy(self, ctx, item_name):
+        wallet = await self.bot.db.fetchval("SELECT wallet FROM economy WHERE userid = $1", ctx.author.id)
+        details = await self.bot.db.fetchrow("SELECT id,price from store WHERE LOWER(name) = LOWER($1)", item_name)
+        if not details or wallet < details["price"]:
+            return await ctx.send("The item dosen't even exist in the store")
+        sql = """insert into inventory (userid, productid, count)
+                    values ($1,$2,$3)
+                on conflict (userid,productid)
+                    do update 
+                set count = inventory.count + $3;"""
+        await self.bot.db.execute(sql, ctx.author.id, details["id"], 1)
+        await self.bot.db.execute("update economy set wallet = wallet - $1 WHERE userid = $2", details["price"],
+                                  ctx.author.id)
+        await ctx.send(f"You have purchased one {item_name.lower()}")
 
 
 def setup(bot):
