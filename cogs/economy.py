@@ -76,6 +76,8 @@ class Economy(commands.Cog):
         details = await self.bot.db.fetchrow("SELECT id,price from store WHERE LOWER(name) = LOWER($1)", item_name)
         if not details or wallet < details["price"]:
             return await ctx.send("The item dosen't even exist in the store")
+        if wallet < details["price"]:
+            return await ctx.send(f"You don't have enough money to but {item_name.lower()}")
         sql = """insert into inventory (userid, productid, count)
                     values ($1,$2,$3)
                 on conflict (userid,productid)
