@@ -15,13 +15,14 @@ class Image(commands.Cog):
             image_url = ctx.author.avatar_url
             async with self.bot.session.get(str(image_url)) as r:
                 img_bytes = await r.read()
-        try:
-            member = await commands.MemberConverter().convert(ctx=ctx, argument=image)
-            image_url = member.avatar_url
-            async with self.bot.session.get(str(image_url)) as r:
-                img_bytes = await r.read()
-        except:
-            return await ctx.send("Emoji inverting coming soon")
+        else:
+            try:
+                member = await commands.MemberConverter().convert(ctx=ctx, argument=image)
+                image_url = member.avatar_url
+                async with self.bot.session.get(str(image_url)) as r:
+                    img_bytes = await r.read()
+            except:
+                return await ctx.send("Emoji inverting coming soon")
 
         partial_function = functools.partial(image_helper.get_inverted_bytes, img_bytes)
         inverted_bytes = await self.bot.loop.run_in_executor(None, partial_function)
