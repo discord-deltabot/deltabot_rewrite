@@ -4,7 +4,7 @@ from discord.ext import commands
 from prettytable import PrettyTable
 
 
-class Owner(commands.Cog):
+class Owner(commands.Cog,command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
