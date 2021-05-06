@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from utils import image_helper
 import functools
+import asyncpg
 
 
 class Image(commands.Cog):
@@ -12,12 +13,12 @@ class Image(commands.Cog):
     async def invert(self, ctx, image=None):
         if image is None:
             image_url = ctx.author.avatar_url
-            with self.bot.session.get(image_url) as r:
+            async with self.bot.session.get(image_url) as r:
                 img_bytes = await r.content()
         try:
             member = await commands.MemberConverter().convert(ctx=ctx, argument=image)
             image_url = member.avatar_url
-            with self.bot.session.get(image_url) as r:
+            async with self.bot.session.get(image_url) as r:
                 img_bytes = await r.content()
         except:
             return await ctx.send("Emoji inverting coming soon")
