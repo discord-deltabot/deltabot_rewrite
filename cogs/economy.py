@@ -88,6 +88,17 @@ class Economy(commands.Cog):
                                   ctx.author.id)
         await ctx.send(f"You have purchased one {item_name.lower()}")
 
+    @commands.command()
+    async def inventory(self, ctx):
+        sql = """SELECT inventory.productid,inventory.count, store.name, store.emoji
+                from inventory,store
+                where inventory.productid = store.id and inventory.userid = $1"""
+        inventory_items = await self.bot.db.fetch(sql,ctx.author.id)
+        embed = discord.Embed(title="{}'s inventory".format(ctx.author.name), color=self.bot.default_color)
+        for item in inventory_items:
+            embed.add_field(name=f'{item["emoji"]} {item["name"]}', value=item["count"])
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))
