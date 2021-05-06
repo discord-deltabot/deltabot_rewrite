@@ -31,7 +31,7 @@ class MyHelp(commands.HelpCommand):
                                  value="\n".join(f"`{self.get_command_signature(x)}`" for x in cmds))
             command_embed = discord.Embed(title=getattr(cog, "qualified_name", "No category"),
                                           color=self.context.bot.default_color)
-            filtered = self.filter_commands(cmds, sort=True)
+            filtered = await self.filter_commands(cmds, sort=True)
             for cmd in filtered:
                 description = cmd.brief or "No description"
                 command_embed.add_field(name=cmd.name, value=f"{description}\n`{self.get_command_signature(cmd)}`")
