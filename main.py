@@ -54,6 +54,7 @@ async def on_ready():
         "cogs.prefix",
         "cogs.moderation",
         "cogs.economy",
+        "cogs.logging",
         "jishaku"
     ]
     bot.session = aiohttp.ClientSession()
