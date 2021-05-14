@@ -53,10 +53,9 @@ async def on_ready():
         "cogs.prefix",
         "cogs.moderation",
         "cogs.economy",
-        "cogs.logging",
+        "cogs.image",
         "jishaku"
     ]
-    bot.session = aiohttp.ClientSession()
     for cog in cogs:
         bot.load_extension(cog)
 

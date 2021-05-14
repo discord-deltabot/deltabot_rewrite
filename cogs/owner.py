@@ -21,20 +21,6 @@ class Owner(commands.Cog,command_attrs=dict(hidden=True)):
                               description=final)
         return await ctx.send(embed=embed)
 
-    @commands.is_owner()
-    @commands.group(name="sql", invoke_without_command=True)
-    async def sql(self, ctx, *, command):
-        res = await self.bot.db.fetch(command)
-        if len(res) == 0:
-            return await ctx.send("Query finished successfully No results to display")
-        headers = list(res[0].keys())
-        table = PrettyTable()
-        table.field_names = headers
-        for record in res:
-            lst = list(record)
-            table.add_row(lst)
-        msg = table.get_string()
-        await ctx.send(f"```\n{msg}\n```")
 
 
 def setup(bot):
