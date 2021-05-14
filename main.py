@@ -54,10 +54,14 @@ async def on_ready():
         "cogs.moderation",
         "cogs.economy",
         "cogs.image",
-        "jishaku"
+        "jishaku",
+        "cogs.owner"
     ]
     for cog in cogs:
-        bot.load_extension(cog)
+        try:
+            bot.load_extension(cog)
+        except Exception as e:
+            print(e)
 
 
 bot.starter()
