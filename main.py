@@ -5,6 +5,7 @@ import os
 import asyncpg
 import asyncio
 import aiohttp
+import typing
 
 from utils.help import MyHelp
 
@@ -22,7 +23,7 @@ class MyBot(commands.Bot):
             "database": os.environ.get("DATABASE_NAME")
         }
         self.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**database_credentials))
-
+        self.schedules = []
         self.prefixes = {}
         super(MyBot, self).__init__(command_prefix=self.get_prefix, help_command=MyHelp())
 
@@ -42,6 +43,34 @@ class MyBot(commands.Bot):
         self.prefixes[message.guild.id] = prefix
         return prefix
 
+    async def create_schedule(self, time, message: str, destination: typing.Union[discord.User, discord.TextChannel]):
+        if isinstance(destination, discord.User):
+            userid, channelid = destination.id, None
+        else:
+            channelid, userid = destination.id, None
+        if userid:
+            id = self.db.fetchval("INSERT INTO schedules (time, message,userid) values ($1,$2,$3)", time, message,
+                                  userid)
+        else:
+            id = await self.db.fetchval("INSERT INTO schedules (time, message,channelid) values ($1,$2,$3)", time,
+                                        message, channelid)
+        map = {}
+        map["id"] = id
+        map["message"] = message
+        map["time"] = time
+        map["channelid"] = channelid if channelid else None
+        map["userid"] = userid if userid else None
+        self.schedules.append(map)
+
+    async def delete_schedule(self, id):
+        self.db.execute("DELETE FROM schedules WHERE id = $1", id)
+        for i in self.schedules:
+            if i["id"] == id:
+                self.schedules.remove(i)
+
+
+
+
 
 bot = MyBot()
 
@@ -55,7 +84,8 @@ async def on_ready():
         "cogs.economy",
         "cogs.image",
         "jishaku",
-        "cogs.owner"
+        "cogs.owner",
+        "cogs.schedule"
     ]
     for cog in cogs:
         try:
