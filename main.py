@@ -44,23 +44,24 @@ class MyBot(commands.Bot):
         self.prefixes[message.guild.id] = prefix
         return prefix
 
-    async def create_schedule(self, time, message: str, destination: typing.Union[discord.User, discord.TextChannel]):
-        if isinstance(destination, discord.User):
-            userid, channelid = destination.id, None
-        else:
-            channelid, userid = destination.id, None
-        if userid:
-            id = self.db.fetchval("INSERT INTO schedules (time, message,userid) values ($1,$2,$3)", time, message,
-                                  userid)
-        else:
-            id = await self.db.fetchval("INSERT INTO schedules (time, message,channelid) values ($1,$2,$3)", time,
-                                        message, channelid)
+    async def create_channel_schedule(self, time, message: str, channel):
+        id = await self.db.fetchval("INSERT INTO schedules (time, message,channelid) values ($1,$2,$3)", time,
+                                        message, channel.id)
         map = {}
         map["id"] = id
         map["message"] = message
         map["time"] = time
-        map["channelid"] = channelid if channelid else None
-        map["userid"] = userid if userid else None
+        map["channelid"] = channel.id
+        self.schedules.append(map)
+
+    async def create_user_schedule(self, time, message: str, user):
+        id = await self.db.fetchval("INSERT INTO schedules (time, message,userid) values ($1,$2,$3)", time,
+                                        message, user.id)
+        map = {}
+        map["id"] = id
+        map["message"] = message
+        map["time"] = time
+        map["userid"] = user.id
         self.schedules.append(map)
 
     async def delete_schedule(self, id):
@@ -76,13 +77,16 @@ bot = MyBot()
 @tasks.loop(seconds=1)
 async def schedule_loop():
     for i in bot.schedules:
-        print(i["time"], time.time())
+        # print(i["time"], time.time())
         if i["time"] <= time.time():
-            print("test")
-            await bot.delete_schedule(i["id"])
-            destination = await bot.fetch_user(i["userid"]) if i["userid"] else bot.get_channel(i["channelid"])
-            embed = discord.Embed(title="Notification", destination=i["message"], color=bot.default_color)
-            await destination.send(embed=embed)
+            # print("test")
+            try:
+                await bot.delete_schedule(i["id"])
+                destination = await bot.fetch_user(i["userid"]) if i["userid"] else bot.get_channel(i["channelid"])
+                embed = discord.Embed(title="Notification", description=i["message"], color=bot.default_color)
+                await destination.send(embed=embed)
+            except Exception as e:
+                print(e)
 
 
 @bot.event
@@ -94,7 +98,8 @@ async def on_ready():
         "cogs.economy",
         "cogs.image",
         "jishaku",
-        "cogs.owner"
+        "cogs.owner",
+        "cogs.misc"
     ]
     for cog in cogs:
         try:
