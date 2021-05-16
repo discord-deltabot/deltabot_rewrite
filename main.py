@@ -1,11 +1,12 @@
 import discord
 from dotenv import load_dotenv
-from discord.ext import commands
+from discord.ext import commands, tasks
 import os
 import asyncpg
 import asyncio
-import aiohttp
+# import aiohttp # will reimport later
 import typing
+import time
 
 from utils.help import MyHelp
 
@@ -63,16 +64,25 @@ class MyBot(commands.Bot):
         self.schedules.append(map)
 
     async def delete_schedule(self, id):
-        self.db.execute("DELETE FROM schedules WHERE id = $1", id)
+        await self.db.execute("DELETE FROM schedules WHERE id = $1", id)
         for i in self.schedules:
             if i["id"] == id:
                 self.schedules.remove(i)
 
 
-
-
-
 bot = MyBot()
+
+
+@tasks.loop(seconds=1)
+async def schedule_loop():
+    for i in bot.schedules:
+        print(i["time"], time.time())
+        if i["time"] <= time.time():
+            print("test")
+            await bot.delete_schedule(i["id"])
+            destination = await bot.fetch_user(i["userid"]) if i["userid"] else bot.get_channel(i["channelid"])
+            embed = discord.Embed(title="Notification", destination=i["message"], color=bot.default_color)
+            await destination.send(embed=embed)
 
 
 @bot.event
@@ -84,14 +94,18 @@ async def on_ready():
         "cogs.economy",
         "cogs.image",
         "jishaku",
-        "cogs.owner",
-        "cogs.schedule"
+        "cogs.owner"
     ]
     for cog in cogs:
         try:
             bot.load_extension(cog)
         except Exception as e:
             print(e)
+    results = await bot.db.fetch("SELECT * FROM schedules;")
+    for result in results:
+        bot.schedules.append(dict(result))
+
+    schedule_loop.start()
 
 
 bot.starter()
