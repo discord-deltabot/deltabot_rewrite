@@ -60,7 +60,7 @@ class Economy(commands.Cog):
             return await ctx.send("You don't have enough money to be withdrawn from bank")
         sql = "UPDATE economy SET bank=bank - $1, wallet = wallet + $1 where userid = $2"
         await self.bot.db.execute(sql, money, ctx.author.id)
-        await ctx.send("You have deposited {} coins to your bank".format(str(money)))
+        await ctx.send("{} coins withdrawn from bank".format(str(money)))
 
     @commands.command(brief="Check store to buy useful items")
     async def store(self, ctx):
@@ -98,6 +98,20 @@ class Economy(commands.Cog):
         for item in inventory_items:
             embed.add_field(name=f'{item["emoji"]} {item["name"]}', value=item["count"])
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def crime(self, ctx):
+        current = await self.bot.db.fetchrow("SELECT wallet, bank FROM economy WHERE userid = $1", ctx.author.id)
+        if current is None:
+            return await ctx.reply("A begger wanna do crime? Lmao!!")
+        if current["wallet"] < 1000:
+            return await ctx.reply("Bruh You need 1000 in your wallet to commit a crime")
+        if random.randint(1,3) != 1:
+            await self.bot.db.execute("UPDATE economy SET wallet = wallet - 1000 WHERE userid = $1", ctx.author.id)
+            return await ctx.reply("You were caught and was charged 1000 coins")
+        money = random.randint(1500,3500)
+        await self.bot.db.execute("UPDATE economy SET wallet = wallet + $1 WHERE userid = $2", money, ctx.author.id)
+        await ctx.reply(f"You committed crime and gained {str(money)} coins. aint it a sin?")
 
 
 def setup(bot):
