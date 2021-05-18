@@ -23,7 +23,7 @@ class Misc(commands.Cog):
         title = result["data"]["children"][index]["data"]["title"]
         embed = discord.Embed(title=title, color=self.bot.default_color)
         embed.set_image(url=image_url)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
 
 def setup(bot):
