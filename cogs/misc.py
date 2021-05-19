@@ -9,6 +9,23 @@ class Misc(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def ping(self, ctx):
+        websocket_latency = self.bot.latency * 1000
+        dbt1 = time.time()
+        await self.bot.db.fetchval("SELECT 1")
+        database_latency = (time.time() - dbt1) * 1000
+        embed = discord.Embed(title="PIng", color=self.bot.default_color)
+        embed.add_field(name="websocket Latency", value=f"```{str(websocket_latency)} ms```", inline=False)
+        embed.add_field(name="database latency", value=f"```{str(database_latency)}```", inline=False)
+        mest1 = time.time()
+        mes = await ctx.send(embed=embed)
+        message_latency = (time.time() - mest1) * 1000
+        embed.add_field(name="Typing", value=f"```{str(message_latency)} ms```")
+        await mes.edit(embed=embed)
+
+
+
+    @commands.command()
     async def remind(self,ctx, seconds, *, reason:str=None):
         await ctx.reply(f"Ok! I will remind you for {reason} in {seconds} second(s)",mention_author=False)
         await self.bot.create_user_schedule(time=time.time()+float(seconds), message=f"Hey you just asked me to remind you for `{reason}` now", user=ctx.author)
